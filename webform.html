@@ -1,0 +1,65 @@
+<form id="userForm" onsubmit="return validateForm(event)">
+    <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" pattern="^[a-zA-Z0-9_]{3,20}$" required>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function validateForm(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    
+    // Client-side validation
+    if (!isValidUsername(username)) {
+        alert('Username must be 3-20 characters long and contain only letters, numbers, and underscores');
+        return false;
+    }
+    
+    if (!isValidEmail(email)) {
+        alert('Please enter a valid email address');
+        return false;
+    }
+    
+    // If validation passes, send to server
+    submitForm(username, email);
+}
+
+function isValidUsername(username) {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    return usernameRegex.test(username);
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+async function submitForm(username, email) {
+    try {
+        const response = await fetch('/api/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Submission failed');
+        }
+        
+        const result = await response.json();
+        alert('Form submitted successfully!');
+    } catch (error) {
+        alert('Error submitting form: ' + error.message);
+    }
+}
+</script>
